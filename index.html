@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi QR Scan</title>
+    <script>
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Function to submit to Google Forms
+        function submitScanData() {
+            const taxiId = getUrlParameter('taxi');
+            const timestamp = new Date().toISOString();
+            
+            // Using your Google Form ID
+            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScFSLMUzOxxAx2OhhP4LoTV0zckY3U6rcJV5viXVOZeVClKqg/formResponse';
+            const formData = new FormData();
+            
+            // Note: You'll need to replace these entry numbers with the correct ones from your form
+            formData.append('entry.1234567890', taxiId); // Replace with your Taxi ID field entry number
+            formData.append('entry.0987654321', timestamp); // Replace with your Timestamp field entry number
+
+            fetch(formUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            }).then(() => {
+                document.getElementById('message').textContent = 'Thank you for scanning!';
+                // Show the embedded form after submission
+                document.getElementById('form-container').style.display = 'block';
+            }).catch(error => {
+                console.error('Error:', error);
+                document.getElementById('message').textContent = 'An error occurred. Please try again.';
+            });
+        }
+
+        // Auto-submit when page loads
+        window.onload = submitScanData;
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #form-container {
+            margin-top: 20px;
+            display: none;
+        }
+        iframe {
+            width: 100%;
+            max-width: 640px;
+            height: 510px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Taxi QR Scanner</h1>
+        <p id="message">Processing your scan...</p>
+        <div id="form-container">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScFSLMUzOxxAx2OhhP4LoTV0zckY3U6rcJV5viXVOZeVClKqg/viewform?embedded=true" width="640" height="510" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+        </div>
+    </div>
+</body>
+</html>
